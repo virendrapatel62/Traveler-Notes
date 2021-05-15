@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login
 
 
 def home(request):
-    return HttpResponse(f"Hello {request.user}")
+    return render(request=request, template_name='notes/index.html', context={})
 
 
 class SignupView(FormView):

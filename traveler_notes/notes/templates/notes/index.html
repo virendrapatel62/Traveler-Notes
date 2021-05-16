@@ -21,7 +21,7 @@
 </head>
 
 <body>
-    <div id="map"></div>;
+    <div id="map"></div>
 
 
     <!-- Note Model Start  -->
@@ -92,8 +92,16 @@
 
     function afterSaveNote(data) {
         console.log({ data });
+
+
+        addMarker(data.lat, data.lng)
         noteModal.hide()
         form.reset()
+    }
+
+    function addMarker(lat, lng) {
+        // add marker 
+        L.marker([lat, lng]).addTo(map);
     }
 
     function saveNote() {
@@ -133,8 +141,9 @@
         map = new MapmyIndia.Map(
             "map",
             {
-                center: [23.1815, 79.9864],
+                center: [20.5937, 78.9629],
                 zoomControl: true,
+                zoom: 5,
                 hybrid: true
             }
         );

@@ -4,9 +4,11 @@ from django.shortcuts import render
 from django.views.generic import FormView
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
+@login_required(login_url='login')
 def home(request):
     return render(request=request, template_name='notes/index.html', context={})
 

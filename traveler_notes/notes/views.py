@@ -1,11 +1,13 @@
 from django.forms.forms import Form
 from django.http import request
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.generic import FormView
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login
-
+from django.views.decorators.csrf import csrf_exempt
+from .models import Note
+from django.core import serializers
 # Create your views here.
 
 
@@ -35,3 +37,18 @@ class LoginView(FormView):
         user = authenticate(username=username, password=password)
         login(request=self.request, user=user)
         return super().form_valid(form)
+
+
+@csrf_exempt
+def createNote(request):
+    print(request.POST)
+    title = request.POST.get('title')
+    comment = request.POST.get('comment')
+    lat = request.POST.get('lat')
+    lng = request.POST.get('lng')
+    user = request.user
+    note = Note(title=title, comment=comment, lat=lat, lng=lng, user=user)
+    # save this note object here
+    note.save()
+
+    return JsonResponse(serializers.serialize('json', [note]), safe=False)

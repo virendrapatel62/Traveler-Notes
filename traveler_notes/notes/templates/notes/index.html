@@ -39,11 +39,11 @@
 
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" placeholder="I Liked Hotel ABC">
+                            <input required type="text" class="form-control" id="title" placeholder="I Liked Hotel ABC">
                         </div>
                         <div class="mb-3">
                             <label for="comment" class="form-label">Comments</label>
-                            <textarea class="form-control" id="comment" rows="4"></textarea>
+                            <textarea required class="form-control" id="comment" rows="4"></textarea>
                         </div>
 
 
@@ -70,11 +70,15 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
     crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+    integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+    crossorigin="anonymous"></script>
 
 <script>
     var map;
     var noteModalHtmlElement;
     var noteModal
+    var title, comment, lat, lng
 
     window.onload = () => {
         console.log("On Load Function")
@@ -84,11 +88,32 @@
         handleNoteFormSubmission()
     }
 
+
+    function afterSaveNote(data) {
+        console.log({ data });
+    }
+
+    function saveNote() {
+        const data = { lat, lng, title, comment }
+        $.ajax({
+            type: "POST",
+            url: '/notes/create',
+            data: data,
+            success: afterSaveNote
+        });
+    }
+
     function handleNoteFormSubmission() {
         const form = document.getElementById('noteForm')
+        // handling form submission
         form.onsubmit = (event) => {
-            console.log("form", event.target);
+
             event.preventDefault()
+            const { title: titleInput, comment: commentInput } = form.elements
+
+            title = titleInput.value
+            comment = commentInput.value
+            saveNote()
         }
     }
 
@@ -117,10 +142,9 @@
 
         map.on('click', (event) => {
             const { latlng } = event
-            const { lat, lng } = latlng
 
-            console.log({ lat, lng });
-
+            lat = latlng.lat
+            lng = latlng.lng
             noteModal.show()
         })
     }

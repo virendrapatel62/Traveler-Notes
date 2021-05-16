@@ -79,6 +79,7 @@
     var noteModalHtmlElement;
     var noteModal
     var title, comment, lat, lng
+    var form
 
     window.onload = () => {
         console.log("On Load Function")
@@ -91,10 +92,12 @@
 
     function afterSaveNote(data) {
         console.log({ data });
+        noteModal.hide()
+        form.reset()
     }
 
     function saveNote() {
-        const data = { lat, lng, title, comment }
+        const data = { lat, lng, title, comment, csrfmiddlewaretoken: '{{csrf_token}}' }
         $.ajax({
             type: "POST",
             url: '/notes/create',
@@ -104,7 +107,7 @@
     }
 
     function handleNoteFormSubmission() {
-        const form = document.getElementById('noteForm')
+        form = document.getElementById('noteForm')
         // handling form submission
         form.onsubmit = (event) => {
 

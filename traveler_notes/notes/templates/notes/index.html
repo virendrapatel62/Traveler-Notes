@@ -75,14 +75,14 @@
     crossorigin="anonymous"></script>
 
 <script>
-    var map;
-    var noteModalHtmlElement;
-    var noteModal
-    var title, comment, lat, lng
-    var form
 
-    var createNoteApi = '/api/notes'
-    var getNotesApi = '/api/notes'
+    var map; // Map main object
+    var noteModalHtmlElement; // Note Modal Div Html Element Obbject 
+    var noteModal // Bootstrap Model Object 
+    var title, comment, lat, lng // form values
+    var form  // html form elemtn model form 
+    var createNoteApi = '/api/notes' // urls
+    var getNotesApi = '/api/notes'  // urls
 
     window.onload = () => {
         console.log("On Load Function")
@@ -101,31 +101,37 @@
                 console.log({ notes });
                 for (let index = 0; index < notes.length; index++) {
                     const note = notes[index]
-                    addMarker(note.lat, note.lng)
+                    addMarker(note)
                 }
             }
         });
     }
 
 
-    function afterSaveNote(data) {
-        console.log({ data });
+    function afterSaveNote(note) {
+        console.log({ note });
 
 
-        addMarker(data.lat, data.lng)
+        addMarker(note)
         noteModal.hide()
         form.reset()
     }
 
-    function addMarker(lat, lng) {
+    function addMarker(note) {
         // add marker 
+        const { lat, lng } = note
         const marker = L.marker([lat, lng]).addTo(map);
 
+        marker.bindPopup(
+            `
+            <h3>${note.title}</h3>  
+            <hr/>      
+            <p>${note.comment}</p>        
+        `
+        )
+
         marker.on('click', event => {
-            console.log(event);
-            const lat = event.latlng.lat
-            const lng = event.latlng.lng
-            console.log({ lat, lng });
+            marker.openPopup()
         })
 
     }
@@ -176,11 +182,9 @@
     }
 
     function handleMapClick() {
-        console.log("Hanlde map click Setup")
-
         map.on('click', (event) => {
             const { latlng } = event
-
+            // assigning to global variables
             lat = latlng.lat
             lng = latlng.lng
             noteModal.show()

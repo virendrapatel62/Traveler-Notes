@@ -81,12 +81,30 @@
     var title, comment, lat, lng
     var form
 
+    var createNoteApi = '/api/notes'
+    var getNotesApi = '/api/notes'
+
     window.onload = () => {
         console.log("On Load Function")
         initializeMap()
         handleMapClick()
         modalSetup()
         handleNoteFormSubmission()
+        getAllNotes()
+    }
+
+    function getAllNotes() {
+        $.ajax({
+            type: "GET",
+            url: getNotesApi,
+            success: function (notes) {
+                console.log({ notes });
+                for (let index = 0; index < notes.length; index++) {
+                    const note = notes[index]
+                    addMarker(note.lat, note.lng)
+                }
+            }
+        });
     }
 
 
@@ -108,7 +126,7 @@
         const data = { lat, lng, title, comment, csrfmiddlewaretoken: '{{csrf_token}}' }
         $.ajax({
             type: "POST",
-            url: '/notes/create',
+            url: createNoteApi,
             data: data,
             success: afterSaveNote
         });

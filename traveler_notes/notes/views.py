@@ -6,7 +6,7 @@ from django.views.generic import FormView
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
-from .models import Note
+from .models import Note , NoteSerializer
 from django.core import serializers
 # Create your views here.
 
@@ -50,5 +50,6 @@ def createNote(request):
     note = Note(title=title, comment=comment, lat=lat, lng=lng, user=user)
     # save this note object here
     note.save()
-
-    return JsonResponse(serializers.serialize('json', [note]), safe=False)
+    serializer = NoteSerializer(note)
+    
+    return JsonResponse( serializer.data , safe=False)

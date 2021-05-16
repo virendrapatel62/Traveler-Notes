@@ -73,18 +73,9 @@
                     <h5 class="modal-title" id="staticBackdropLabel">Note Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div id='noteDetailModalBody' class="modal-body">
                     <!-- sample card  -->
-                    <div class="card" style="width: 18rem;">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
 
-                            <p class="card-text">Some quick example text to build on the card title and make up the bulk
-                                of the card's content.</p>
-                            <a href="#" class="card-link btn btn-info btn-sm">Edit</a>
-                            <a href="#" class="card-link btn btn-danger btn-sm">Delete</a>
-                        </div>
-                    </div>
                     <!--  -->
 
                 </div>
@@ -97,6 +88,20 @@
     </div>
 
     <!-- detail maodel end  -->
+
+
+    <!-- SAMPLE HTMLS -->
+
+    <div hidden id='noteDetailCardTemplate' class="card mt-2">
+        <div class="card-body">
+            <h5 class="card-title title">Card title</h5>
+
+            <p class="card-text comment">Some quick example text to build on the card title and make up the bulk
+                of the card's content.</p>
+            <a href="#" class="card-link btn btn-info btn-sm">Edit</a>
+            <a href="#" class="card-link btn btn-danger btn-sm">Delete</a>
+        </div>
+    </div>
 
 </body>
 
@@ -119,6 +124,10 @@
     var createNoteApi = '/api/notes' // urls
     var getNotesApi = '/api/notes'  // urls
     var detailModal // Bootstrap Object
+
+    //IDS
+    var noteDetailModalBodyId = 'noteDetailModalBody'
+    var noteDetailCardTemplateId = 'noteDetailCardTemplate'
 
     window.onload = () => {
         console.log("On Load Function")
@@ -159,6 +168,23 @@
         const marker = L.marker([lat, lng]).addTo(map);
 
         marker.on('click', event => {
+
+            template = document.getElementById(noteDetailCardTemplateId)
+            modalBody = document.getElementById(noteDetailModalBodyId)
+
+            // clearing body 
+            while (modalBody.firstChild) {
+                modalBody.removeChild(modalBody.firstChild)
+            }
+
+            const card = template.cloneNode(true)
+            card.hidden = false
+            card.querySelector('.title').textContent = note.title
+            card.querySelector('.comment').textContent = note.comment
+
+
+            modalBody.appendChild(card)
+
             detailModal.show()
         })
 

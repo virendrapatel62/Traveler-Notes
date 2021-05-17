@@ -13,6 +13,9 @@ class Note(models.Model):
     lat = models.CharField(max_length=30, null=False)
     lng = models.CharField(max_length=30, null=False)
 
+    def __str__(self):
+        return f'lat={self.lat } lng={self.lng} title={self.title}'
+
 
 class NoteSerializer(ModelSerializer):
     class Meta:

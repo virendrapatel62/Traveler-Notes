@@ -13,7 +13,7 @@
         body,
         #map {
             margin: 0;
-            padding: 0;
+            padding: 0px;
             width: 100%;
             height: 100%;
         }
@@ -21,6 +21,8 @@
 </head>
 
 <body>
+    <!-- map div  -->
+
     <div id="map"></div>
 
 
@@ -81,7 +83,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Add More</button>
+                    <button id="addmore" type="button" class="btn btn-primary">Add More</button>
                 </div>
             </div>
         </div>
@@ -99,7 +101,7 @@
             <p class="card-text comment">Some quick example text to build on the card title and make up the bulk
                 of the card's content.</p>
             <a href="#" class="card-link btn btn-info btn-sm">Edit</a>
-            <a href="#" class="card-link btn btn-danger btn-sm">Delete</a>
+            <a href="#" class="card-link btn btn-danger btn-sm deleteNoteButton">Delete</a>
         </div>
     </div>
 
@@ -123,7 +125,12 @@
     var form  // html form elemtn model form 
     var createNoteApi = '/api/notes' // urls
     var getNotesApi = '/api/notes'  // urls
+    var deleteNoteUrl = '/api/notes/'  // urls
     var detailModal // Bootstrap Object
+    var selectedMarkerLatLng
+
+    var notes = [];
+
 
     //IDS
     var noteDetailModalBodyId = 'noteDetailModalBody'
@@ -136,14 +143,27 @@
         modalSetup()
         handleNoteFormSubmission()
         getAllNotes()
+        setupAddMore()
+    }
+
+    function setupAddMore() {
+        document.getElementById('addmore')
+            .onclick = () => {
+                lat = selectedMarkerLatLng.lat
+                lng = selectedMarkerLatLng.lng
+                detailModal.hide()
+                noteModal.show()
+            }
     }
 
     function getAllNotes() {
         $.ajax({
             type: "GET",
             url: getNotesApi,
-            success: function (notes) {
-                console.log({ notes });
+            success: function (data) {
+                console.log({ data });
+
+                notes = data;
                 for (let index = 0; index < notes.length; index++) {
                     const note = notes[index]
                     addMarker(note)
@@ -156,6 +176,7 @@
     function afterSaveNote(note) {
         console.log({ note });
 
+        notes.push(note)
 
         addMarker(note)
         noteModal.hide()
@@ -168,26 +189,60 @@
         const marker = L.marker([lat, lng]).addTo(map);
 
         marker.on('click', event => {
+            selectedMarkerLatLng = event.latlng
+            showDetailModal(event)
+        })
 
-            template = document.getElementById(noteDetailCardTemplateId)
-            modalBody = document.getElementById(noteDetailModalBodyId)
+    }
 
-            // clearing body 
-            while (modalBody.firstChild) {
-                modalBody.removeChild(modalBody.firstChild)
+    function showDetailModal(event) {
+        template = document.getElementById(noteDetailCardTemplateId)
+        modalBody = document.getElementById(noteDetailModalBodyId)
+
+        // clearing body 
+        while (modalBody.firstChild) {
+            modalBody.removeChild(modalBody.firstChild)
+        }
+
+        filteredNotes = notes.filter(
+            (note) => {
+                if (note.lat == selectedMarkerLatLng.lat && note.lng == selectedMarkerLatLng.lng) return true
+
+                return false
             }
+        )
 
+        console.log(filteredNotes)
+
+        filteredNotes.forEach(note => {
             const card = template.cloneNode(true)
             card.hidden = false
             card.querySelector('.title').textContent = note.title
             card.querySelector('.comment').textContent = note.comment
 
+            // delete Card Button Handle 
+            card.querySelector('.deleteNoteButton').onclick = () => {
+
+                $.ajax({
+                    type: "DELETE",
+                    url: deleteNoteUrl + note.id,
+                    beforeSend: (xhr) => {
+                        xhr.setRequestHeader('X-CSRFTOKEN', '{{csrf_token}}')
+                    },
+                    success: () => {
+                        detailModal.hide()
+                        const index = notes.findIndex((value) => note.id == value.id)
+                        if (index >= 0) {
+                            notes.splice(index, 1)
+                        }
+                    }
+                });
+            }
 
             modalBody.appendChild(card)
-
-            detailModal.show()
         })
 
+        detailModal.show()
     }
 
     function saveNote() {
@@ -246,6 +301,9 @@
             noteModal.show()
         })
     }
+
+
+
 
 
 

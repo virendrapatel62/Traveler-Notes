@@ -1,9 +1,22 @@
-<h1>Login Page</h1>
+{% extends 'notes/base.html' %}
+{% load crispy_forms_tags %}
 
-<form method="post">
-    {% csrf_token %}
-    {{form.as_p}}
+{%block content%}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<div class="container">
 
-    <br>
-    <input type="submit" value="Login">
-</form>
+
+    <div class="border shadow shadow-md m-4 p-4 rounded col-lg-5">
+        <h1>Login</h1>
+        <hr>
+        <form method="post">
+            {% csrf_token %}
+            {{form|crispy}}
+
+            <br>
+            <input class="btn btn-success col-lg-5" type="submit" value="Login">
+        </form>
+    </div>
+</div>
+{%endblock%}

@@ -1,0 +1,42 @@
+{% extends 'notes/base.html' %}
+{% load custom_tags %}
+
+{%block content%}
+
+<div class="container-fluid">
+    <div class="container">
+        <h1 class="display-4">My Notes</h1>
+        <hr>
+    </div>
+
+    <br>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Sno.</th>
+                <th>Title</th>
+                <th>Comment</th>
+                <th>Formatted Address</th>
+                <th>State</th>
+                <th>City</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for note in notes %}
+            <tr>
+                <td>{{forloop.counter}}</td>
+                <td>{{note.title}}</td>
+                <td width='50%'>{{note.comment}}</td>
+                {% get_address note.lat note.lng as address %}
+                <span hidden>{{address}}</span>
+                <td>{{address.formatted_address|default:address.error}}</td>
+                <td>{{address.state|default:address.error}}</td>
+                <td>{{address.city|default:address.error}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{%endblock%}

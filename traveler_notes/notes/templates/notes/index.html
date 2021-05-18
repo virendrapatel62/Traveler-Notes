@@ -1,115 +1,87 @@
+{% extends 'notes/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'notes/css/index.css' %}">
-    <link rel="stylesheet" href="{% static 'notes/css/map.css' %}">
-</head>
+{% block content %}
 
-<body>
+<style>
+    .col img {
+        height: 100px;
+        border-radius: 50%;
+        background-color: rgb(193, 233, 152);
+        padding: 10px;
+    }
 
-    <!-- Search Box -->
-    <div id="searchBox" class="col-lg-4 col-md-6 col-sm-10">
-        <input type="text" placeholder="Search Place" name="search" id="searchInput" class="w-100">
-        <ul class="list-group" id="places">
+    a {
+        text-decoration: none;
+        color: black
+    }
 
-        </ul>
-    </div>
+    a :hover {
+        text-decoration: none;
+        color: black
+    }
 
-    <!-- map div  -->
-    <div id="map"></div>
+    html,
+    body,
+    .container-fluid {
+        height: 100%;
+    }
 
+    #map {
+        height: 85%;
+        margin-top: 10px;
+    }
 
-    <!-- Note Model Start  -->
-    <div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title display-4" id="exampleModalLabel">Add New Note</h3>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <!-- form start  -->
-                <form method="post" id='noteForm'>
-                    <!-- model Body -->
-                    <div class="modal-body">
+    .button-div:hover {
+        cursor: pointer;
+        box-shadow: 1px 10px 10px rgb(214, 209, 209);
 
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Title</label>
-                            <input required type="text" class="form-control" id="title" placeholder="I Liked Hotel ABC">
-                        </div>
-                        <div class="mb-3">
-                            <label for="comment" class="form-label">Comments</label>
-                            <textarea required class="form-control" id="comment" rows="4"></textarea>
-                        </div>
+    }
+</style>
+<div class="container-fluid">
+    <div class="row h-100">
+        <!-- map -->
+        <div class="col-10 h-100">
+            <div class="border rounded" id="map">
 
-
-                    </div>
-                    <!-- model Body End  -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <input type="submit" class="btn btn-primary" value="Create Note">
-
-                    </div>
-                </form>
             </div>
         </div>
-    </div>
-
-    <!-- Note Model end  -->
 
 
-    <!-- detail Model  -->
 
-    <!-- Modal -->
-    <div class="modal fade " id="detailModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Note Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Actions buttons -->
+        <div class="col">
+            <div class="row">
+                <div class="col button-div border border-success rounded m-4 p-4">
+                    <a href="/my-notes">
+                        <div class="image-wrapper text-center">
+                            <img class="text-center" src="{%static 'notes/images/list.png'%}" alt="">
+                            <br>
+                            <hr>
+                            <h5 class="text-center">My Notes</h5>
+                        </div>
+                    </a>
                 </div>
-                <div id='noteDetailModalBody' class="modal-body">
-                    <!-- sample card  -->
 
-                    <!--  -->
+                <div class="col button-div border border-success rounded m-4 p-4">
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button id="addmore" type="button" class="btn btn-primary">Add More</button>
+
+                    <a href="/notes/map">
+                        <div class="image-wrapper text-center">
+                            <img style="background-color:#4FBA6F" class="text-center"
+                                src="{%static 'notes/images/add.png'%}" alt="">
+                            <hr>
+                            <h5 class="text-center">Add Notes</h5>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- detail maodel end  -->
 
-
-    <!-- SAMPLE HTMLS -->
-
-    <!-- NOTE DATIL CARD SAMPLE -->
-    <div hidden id='noteDetailCardTemplate' class="card mt-2">
-        <div class="card-body">
-            <h5 class="card-title title">Card title</h5>
-
-            <p class="card-text comment">Some quick example text to build on the card title and make up the bulk
-                of the card's content.</p>
-            <a href="#" class="card-link btn btn-info btn-sm">Edit</a>
-            <a href="#" class="card-link btn btn-danger btn-sm deleteNoteButton">Delete</a>
-        </div>
-    </div>
-
-</body>
-
-<!-- Map Javascript -->
+<!-- Scripts -->
 <script src="https://apis.mapmyindia.com/advancedmaps/v1/4co9h19opazwpeulj4b28t8dfuwh7ykm/map_load?v=1.3"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
@@ -121,5 +93,6 @@
     var CSRF_TOKEN = '{{csrf_token}}'
 </script>
 <script src="{% static 'notes/js/index.js' %}"></script>
+<script src="{% static 'notes/js/map_view.js' %}"></script>
 
-</html>
+{% endblock %}

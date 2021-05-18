@@ -110,3 +110,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+CLIENT_ID = '33OkryzDZsK0_lZ2IXkJkrKruv8BqmM-B_3U9-FQUHIGkDe5LxR-D67_Aa9_yxRl1KB5oOkFbcFNlkknTwz-Fy-oUV_8ZeYiJgQYimJoDd2dxByWKf_DXQ=='
+CLIENT_SECRET = 'lrFxI-iSEg_pkRLZTay7C0PT-ttRoiR6qBCXX5LEr4JdkR_APYhki8ZzTl0ZKX1VxAIN9G_R7nbEWdmJzTMXjn4b4soun-LeecDgxTTcdox42Tl1TGdm-fjvRjMnTb6Q'
+MAP_REST_API_KEY = 'e5a9st118opyvgfyktxdj5j6tankqz34'
+INTERACTIVE_MAP_API_KEY = '4co9h19opazwpeulj4b28t8dfuwh7ykm'

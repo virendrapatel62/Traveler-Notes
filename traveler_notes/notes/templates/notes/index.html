@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,21 +9,21 @@
     <title>Document</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-    <style>
-        html,
-        body,
-        #map {
-            margin: 0;
-            padding: 0px;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'notes/css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'notes/css/map.css' %}">
 </head>
 
 <body>
-    <!-- map div  -->
 
+    <!-- Search Box -->
+    <div id="searchBox" class="col-lg-4 col-md-6 col-sm-10">
+        <input type="text" placeholder="Search Place" name="search" id="searchInput" class="w-100">
+        <ul class="list-group" id="places">
+
+        </ul>
+    </div>
+
+    <!-- map div  -->
     <div id="map"></div>
 
 
@@ -94,6 +95,7 @@
 
     <!-- SAMPLE HTMLS -->
 
+    <!-- NOTE DATIL CARD SAMPLE -->
     <div hidden id='noteDetailCardTemplate' class="card mt-2">
         <div class="card-body">
             <h5 class="card-title title">Card title</h5>
@@ -115,198 +117,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
     integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
     crossorigin="anonymous"></script>
-
 <script>
-
-    var map; // Map main object
-    var noteModalHtmlElement; // Note Modal Div Html Element Obbject 
-    var noteModal // Bootstrap Model Object 
-    var title, comment, lat, lng // form values
-    var form  // html form elemtn model form 
-    var createNoteApi = '/api/notes' // urls
-    var getNotesApi = '/api/notes'  // urls
-    var deleteNoteUrl = '/api/notes/'  // urls
-    var detailModal // Bootstrap Object
-    var selectedMarkerLatLng
-
-    var notes = [];
-
-
-    //IDS
-    var noteDetailModalBodyId = 'noteDetailModalBody'
-    var noteDetailCardTemplateId = 'noteDetailCardTemplate'
-
-    window.onload = () => {
-        console.log("On Load Function")
-        initializeMap()
-        handleMapClick()
-        modalSetup()
-        handleNoteFormSubmission()
-        getAllNotes()
-        setupAddMore()
-    }
-
-    function setupAddMore() {
-        document.getElementById('addmore')
-            .onclick = () => {
-                lat = selectedMarkerLatLng.lat
-                lng = selectedMarkerLatLng.lng
-                detailModal.hide()
-                noteModal.show()
-            }
-    }
-
-    function getAllNotes() {
-        $.ajax({
-            type: "GET",
-            url: getNotesApi,
-            success: function (data) {
-                console.log({ data });
-
-                notes = data;
-                for (let index = 0; index < notes.length; index++) {
-                    const note = notes[index]
-                    addMarker(note)
-                }
-            }
-        });
-    }
-
-
-    function afterSaveNote(note) {
-        console.log({ note });
-
-        notes.push(note)
-
-        addMarker(note)
-        noteModal.hide()
-        form.reset()
-    }
-
-    function addMarker(note) {
-        // add marker 
-        const { lat, lng } = note
-        const marker = L.marker([lat, lng]).addTo(map);
-
-        marker.on('click', event => {
-            selectedMarkerLatLng = event.latlng
-            showDetailModal(event)
-        })
-
-    }
-
-    function showDetailModal(event) {
-        template = document.getElementById(noteDetailCardTemplateId)
-        modalBody = document.getElementById(noteDetailModalBodyId)
-
-        // clearing body 
-        while (modalBody.firstChild) {
-            modalBody.removeChild(modalBody.firstChild)
-        }
-
-        filteredNotes = notes.filter(
-            (note) => {
-                if (note.lat == selectedMarkerLatLng.lat && note.lng == selectedMarkerLatLng.lng) return true
-
-                return false
-            }
-        )
-
-        console.log(filteredNotes)
-
-        filteredNotes.forEach(note => {
-            const card = template.cloneNode(true)
-            card.hidden = false
-            card.querySelector('.title').textContent = note.title
-            card.querySelector('.comment').textContent = note.comment
-
-            // delete Card Button Handle 
-            card.querySelector('.deleteNoteButton').onclick = () => {
-
-                $.ajax({
-                    type: "DELETE",
-                    url: deleteNoteUrl + note.id,
-                    beforeSend: (xhr) => {
-                        xhr.setRequestHeader('X-CSRFTOKEN', '{{csrf_token}}')
-                    },
-                    success: () => {
-                        detailModal.hide()
-                        const index = notes.findIndex((value) => note.id == value.id)
-                        if (index >= 0) {
-                            notes.splice(index, 1)
-                        }
-                    }
-                });
-            }
-
-            modalBody.appendChild(card)
-        })
-
-        detailModal.show()
-    }
-
-    function saveNote() {
-        const data = { lat, lng, title, comment, csrfmiddlewaretoken: '{{csrf_token}}' }
-        $.ajax({
-            type: "POST",
-            url: createNoteApi,
-            data: data,
-            success: afterSaveNote
-        });
-    }
-
-    function handleNoteFormSubmission() {
-        form = document.getElementById('noteForm')
-        // handling form submission
-        form.onsubmit = (event) => {
-
-            event.preventDefault()
-            const { title: titleInput, comment: commentInput } = form.elements
-
-            title = titleInput.value
-            comment = commentInput.value
-            saveNote()
-        }
-    }
-
-    function modalSetup() {
-        console.log("Doing Modal Setup")
-        noteModalHtmlElement = document.getElementById('noteModal')
-        const detailModalDiv = document.getElementById('detailModal')
-        noteModal = new bootstrap.Modal(noteModalHtmlElement)
-        detailModal = new bootstrap.Modal(detailModalDiv)
-
-    }
-
-
-    function initializeMap() {
-        console.log("Initialize Map Function")
-        map = new MapmyIndia.Map(
-            "map",
-            {
-                center: [20.5937, 78.9629],
-                zoomControl: true,
-                zoom: 5,
-                hybrid: true
-            }
-        );
-    }
-
-    function handleMapClick() {
-        map.on('click', (event) => {
-            const { latlng } = event
-            // assigning to global variables
-            lat = latlng.lat
-            lng = latlng.lng
-            noteModal.show()
-        })
-    }
-
-
-
-
-
-
+    var CSRF_TOKEN = '{{csrf_token}}'
 </script>
+<script src="{% static 'notes/js/index.js' %}"></script>
 
 </html>
